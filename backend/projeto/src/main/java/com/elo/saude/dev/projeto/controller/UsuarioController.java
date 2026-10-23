@@ -26,7 +26,6 @@ public class UsuarioController {
         this.service = service;
     }
 
-    // Público: cadastro de paciente
     @PostMapping("/registro")
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse registrar(@Valid @RequestBody RegistroRequest req) {
@@ -34,7 +33,6 @@ public class UsuarioController {
                 service.criar(req.nome(), req.email(), req.senha(), Perfil.PACIENTE));
     }
 
-    // Qualquer usuário logado
     @GetMapping("/me")
     public UsuarioResponse me(Authentication auth) {
         return UsuarioResponse.from(service.buscarPorEmail(auth.getName()));
@@ -46,7 +44,6 @@ public class UsuarioController {
         return UsuarioResponse.from(service.atualizarNome(auth.getName(), req.nome()));
     }
 
-    // Somente ADMIN
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ADMIN')")

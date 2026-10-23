@@ -34,7 +34,6 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.email().trim().toLowerCase(), req.senha()));
         } catch (AuthenticationException e) {
-            // mesma mensagem para senha errada, usuário inexistente ou desativado
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "E-mail ou senha inválidos");
         }
         var usuario = usuarioService.buscarPorEmail(req.email());

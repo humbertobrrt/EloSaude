@@ -1,2 +1,2 @@
-# ConectaSaude2026
+# EloSaude
 Projeto feito pelo grupo "BackEnd Boys"

@@ -30,6 +30,40 @@ h3,
 
 /* CABEÇALHO */
 
+/* logo: troque o bloco .logo b por estes dois */
+.logo b {
+    color: var(--pri);
+}
+
+.logo img {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    object-fit: contain;
+    display: block;
+    margin-left: 25px;
+}
+
+/* menu */
+nav {
+    display: flex;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+nav a {
+    padding: 8px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    color: var(--muted);
+    font-weight: 600;
+    transition: 0.25s;
+}
+
+
+
 .top {
     position: sticky;
     top: 0;
@@ -85,7 +119,7 @@ nav {
 }
 
 nav a {
-    padding: 8px 14px;
+    padding: 12px 18px;
     border-radius: 999px;
     text-decoration: none;
     color: var(--muted);

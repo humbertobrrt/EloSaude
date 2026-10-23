@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Login | EloSaúde</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="login.css">
+</head>
+
+<body class="login-body">
+
+  <main class="login-card">
+
+    <header class="login-brand">
+      <div class="login-symbol">+</div>
+
+      <h1>Elo<span>Saúde</span></h1>
+
+      <p>
+        A informação conecta.<br>
+        O cuidado continua.
+      </p>
+    </header>
+
+    <form id="loginForm" class="login-form">
+
+      <label for="email">E-mail institucional</label>
+
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="seu@email.com"
+        autocomplete="username"
+        required
+      >
+
+      <label for="senha">Senha</label>
+
+      <input
+        type="password"
+        id="senha"
+        name="senha"
+        placeholder="Digite sua senha"
+        autocomplete="current-password"
+        required
+      >
+
+      <button class="login-button" type="submit">
+        Entrar no sistema →
+      </button>
+
+      <p
+        id="erro"
+        class="login-error"
+        role="alert"
+        aria-live="polite"
+      ></p>
+
+    </form>
+
+    <footer class="login-footer">
+      Ambiente demonstrativo<br>
+      Paciente: paciente@elosaude.com.br / Paciente123!<br>
+      Médico: medico@elosaude.com.br / Medico123!
+    </footer>
+
+  </main>
+
+  <script src="contas.js"></script>
+  <script>
+    const form = document.getElementById("loginForm");
+    const erro = document.getElementById("erro");
+    const botao = form.querySelector("button");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      erro.textContent = "";
+
+      const email = document
+        .getElementById("email")
+        .value
+        .trim();
+
+      const senha = document
+        .getElementById("senha")
+        .value;
+
+      const conta = autenticar(email, senha);
+
+      if (conta) {
+        salvarSessao(conta);
+
+        botao.disabled = true;
+        botao.textContent = "Entrando...";
+
+        window.location.href = "index.html";
+
+      } else {
+        erro.textContent =
+          "E-mail ou senha incorretos. Tente novamente.";
+
+        document.getElementById("senha").value = "";
+        document.getElementById("senha").focus();
+      }
+    });
+  </script>
+
+</body>
+</html>

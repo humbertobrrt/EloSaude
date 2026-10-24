@@ -37,7 +37,14 @@ class ApiError extends Error {
 
 async function api(caminho, { metodo = "GET", corpo, auth = true } = {}) {
     const headers = { "Content-Type": "application/json" };
-    if (auth && Sessao.token()) headers.Authorization = "Bearer " + Sessao.token();
+    
+    // CORREÇÃO: Só adiciona o token se auth for true E existir um token válido
+    if (auth) {
+        const token = Sessao.token();
+        if (token) {
+            headers.Authorization = "Bearer " + token;
+        }
+    }
 
     let resp;
     try {
@@ -65,7 +72,11 @@ async function api(caminho, { metodo = "GET", corpo, auth = true } = {}) {
 
 const Api = {
     login: (email, senha) => api("/api/auth/login", { metodo: "POST", corpo: { email, senha }, auth: false }),
-    registrar: (nome, email, senha) => api("/api/usuarios/registro", { metodo: "POST", corpo: { nome, email, senha }, auth: false }),
+    registrar: (nome, email, senha) => {
+        // Garante que qualquer sessão residual seja limpa antes de registrar
+        Sessao.limpar();
+        return api("/api/usuarios/registro", { metodo: "POST", corpo: { nome, email, senha }, auth: false });
+    },
     eu: () => api("/api/usuarios/me"),
     atualizarMeuNome: nome => api("/api/usuarios/me", { metodo: "PATCH", corpo: { nome } }),
     // somente ADMIN

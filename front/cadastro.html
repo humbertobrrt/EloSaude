@@ -36,7 +36,10 @@
     </footer>
   </main>
 
+  <!-- 1. O api.js deve vir primeiro para carregar o objeto global Api -->
   <script src="api.js"></script>
+  
+  <!-- 2. O script da página vem depois -->
   <script>
     const form = document.getElementById("cadForm");
     const erro = document.getElementById("erro");
@@ -47,10 +50,14 @@
       erro.textContent = "";
       botao.disabled = true;
       botao.textContent = "Criando...";
+      
+      const nome = document.getElementById("nome").value.trim();
       const email = document.getElementById("email").value.trim();
       const senha = document.getElementById("senha").value;
+
       try {
-        await Api.registrar(document.getElementById("nome").value.trim(), email, senha);
+        // Chamando Api com 'A' maiúsculo conforme definido em api.js
+        await Api.registrar(nome, email, senha);
         await entrar(email, senha);
         location.href = "index.html";
       } catch (err) {

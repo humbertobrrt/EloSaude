@@ -1,5 +1,7 @@
+
 /* Unidades vêm da API (GET /api/unidades-saude). Começa vazio e é preenchido por carregarUnidades(). */
 let unidades = [];
+let erroUnidades = "";
 
 /* Converte o formato da API para o usado nas telas (esp = array de especialidades) */
 function normalizarUnidade(u) {
@@ -22,8 +24,11 @@ async function carregarUnidades() {
         const dados = await Api.listarUnidades();
         const lista = Array.isArray(dados) ? dados : (dados?.content || []);
         unidades = lista.map(normalizarUnidade).filter(u => u.ativa);
+        erroUnidades = "";
+        console.log("Unidades carregadas da API:", unidades);
     } catch (erro) {
-        console.error(erro);
+        erroUnidades = `${erro.message}${erro.status ? " (HTTP " + erro.status + ")" : ""}`;
+        console.error("Falha ao carregar unidades:", erro);
         toast(erro.message || "Não foi possível carregar as unidades.");
     }
 }
@@ -180,7 +185,9 @@ function listaUni(termo = "") {
     );
 
     if (!encontradas.length) {
-        return "<p class='muted'>Nenhuma unidade encontrada.</p>";
+        return erroUnidades
+            ? `<p class='muted'>Não foi possível carregar as unidades: ${esc(erroUnidades)}</p>`
+            : "<p class='muted'>Nenhuma unidade encontrada.</p>";
     }
 
     return encontradas.map(u => `

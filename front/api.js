@@ -1,93 +1,109 @@
-/* Cliente da API EloSaúde (documentada em http://localhost:8080/swagger-ui/index.html) */
-const API_URL = "http://localhost:8080";
-const CHAVE_TOKEN = "elosaude_token";
-const CHAVE_USER = "elosaude_user";
+/* unidades.js — carrega as unidades da API e alimenta os cards e o select.
+ *
+ * Requer o api.js carregado ANTES (usa Api.listarUnidades()).
+ *
+ * HTML esperado (ajuste os ids se os seus forem outros):
+ *   <input id="busca-unidades" placeholder="Buscar por nome, bairro ou especialidade...">
+ *   <div id="lista-unidades"></div>
+ *   <select id="unidade-select"></select>
+ *
+ *   <script src="api.js"></script>
+ *   <script src="unidades.js"></script>
+ */
 
-/* Perfil do backend -> perfil usado nas telas do front */
-const PERFIL_FRONT = { PACIENTE: "paciente", PROFISSIONAL: "medico", ADMIN: "medico" };
+let unidadesCache = [];
 
-const Sessao = {
-    token: () => sessionStorage.getItem(CHAVE_TOKEN),
-    usuario() {
-        try { return JSON.parse(sessionStorage.getItem(CHAVE_USER)); }
-        catch { return null; }
-    },
-    salvar(token, usuarioApi) {
-        const u = {
-            id: usuarioApi.id,
-            email: usuarioApi.email,
-            nome: usuarioApi.nome,
-            perfilApi: usuarioApi.perfil,
-            perfil: PERFIL_FRONT[usuarioApi.perfil] || "paciente",
-            unidadeId: "u1" // o backend ainda não vincula usuário a unidade
-        };
-        sessionStorage.setItem(CHAVE_TOKEN, token);
-        sessionStorage.setItem(CHAVE_USER, JSON.stringify(u));
-        return u;
-    },
-    limpar() {
-        sessionStorage.removeItem(CHAVE_TOKEN);
-        sessionStorage.removeItem(CHAVE_USER);
-    }
-};
-
-class ApiError extends Error {
-    constructor(status, message) { super(message); this.status = status; }
+/* Isola os nomes dos campos da API num lugar só.
+ * A API devolve: id, nome, tipo, endereco, bairro, cidade, uf, telefone,
+ * especialidades (string separada por vírgula) e ativa. */
+function normalizar(u) {
+    return {
+        id: u.id,
+        nome: u.nome || "",
+        tipo: u.tipo || "",
+        endereco: u.endereco || "",
+        bairro: u.bairro || "",
+        cidade: u.cidade || "",
+        uf: u.uf || "",
+        telefone: u.telefone || "",
+        // "Clínica geral, Enfermagem, Pediatria" -> ["Clínica geral", "Enfermagem", "Pediatria"]
+        especialidades: typeof u.especialidades === "string"
+            ? u.especialidades.split(",").map(e => e.trim()).filter(Boolean)
+            : Array.isArray(u.especialidades) ? u.especialidades : [],
+        ativa: u.ativa !== false
+    };
 }
 
-async function api(caminho, { metodo = "GET", corpo, auth = true } = {}) {
-    const headers = { "Content-Type": "application/json" };
-    
-    // CORREÇÃO: Só adiciona o token se auth for true E existir um token válido
-    if (auth) {
-        const token = Sessao.token();
-        if (token) {
-            headers.Authorization = "Bearer " + token;
-        }
+/* Evita injeção de HTML vindo da API */
+function esc(texto) {
+    const d = document.createElement("div");
+    d.textContent = texto ?? "";
+    return d.innerHTML;
+}
+
+function renderCards(lista) {
+    const container = document.querySelector("#lista-unidades");
+    if (!container) return;
+
+    if (!lista.length) {
+        container.innerHTML = "<p>Nenhuma unidade encontrada.</p>";
+        return;
     }
 
-    let resp;
+    container.innerHTML = lista.map(u => `
+        <article class="card-unidade">
+            <span class="tag">${esc(u.tipo)}</span>
+            <h3>${esc(u.nome)}</h3>
+            <p>${esc(u.bairro)}${u.cidade ? " · " + esc(u.cidade) : ""}</p>
+            ${u.telefone ? `<p class="telefone">${esc(u.telefone)}</p>` : ""}
+            <div class="tags">
+                ${u.especialidades.map(e => `<span class="tag">${esc(e)}</span>`).join("")}
+            </div>
+        </article>
+    `).join("");
+}
+
+function renderSelect(lista) {
+    const select = document.querySelector("#unidade-select");
+    if (!select) return;
+
+    // value = id da unidade (é o que vai para o backend em "Solicitar ficha")
+    select.innerHTML = lista
+        .map(u => `<option value="${esc(String(u.id))}">${esc(u.nome)}</option>`)
+        .join("");
+}
+
+/* Busca por nome, bairro ou especialidade (filtra o que já foi carregado) */
+function filtrar(termo) {
+    const t = termo.trim().toLowerCase();
+    if (!t) return unidadesCache;
+    return unidadesCache.filter(u =>
+        u.nome.toLowerCase().includes(t) ||
+        u.bairro.toLowerCase().includes(t) ||
+        u.especialidades.some(e => e.toLowerCase().includes(t))
+    );
+}
+
+async function carregarUnidades() {
+    const container = document.querySelector("#lista-unidades");
+    if (container) container.innerHTML = "<p>Carregando unidades...</p>";
+
     try {
-        resp = await fetch(API_URL + caminho, {
-            method: metodo,
-            headers,
-            body: corpo ? JSON.stringify(corpo) : undefined
-        });
-    } catch {
-        throw new ApiError(0, "Não foi possível conectar ao servidor. Verifique se a API está rodando em " + API_URL + ".");
-    }
+        const dados = await Api.listarUnidades();
+        // aceita array puro ou resposta paginada ({ content: [...] })
+        const lista = Array.isArray(dados) ? dados : (dados?.content || []);
+        unidadesCache = lista.map(normalizar).filter(u => u.ativa);
 
-    if (resp.status === 401 && auth) {
-        Sessao.limpar();
-        if (!location.pathname.endsWith("login.html")) location.href = "login.html";
+        renderCards(unidadesCache);
+        renderSelect(unidadesCache);
+    } catch (e) {
+        if (container) container.innerHTML = `<p class="erro">${esc(e.message)}</p>`;
     }
-
-    const dados = await resp.json().catch(() => null);
-    if (!resp.ok) {
-        const msg = dados?.message || dados?.error || dados?.detail || ("Erro " + resp.status);
-        throw new ApiError(resp.status, msg);
-    }
-    return dados;
 }
 
-const Api = {
-    login: (email, senha) => api("/api/auth/login", { metodo: "POST", corpo: { email, senha }, auth: false }),
-    registrar: (nome, email, senha) => {
-        // Garante que qualquer sessão residual seja limpa antes de registrar
-        Sessao.limpar();
-        return api("/api/usuarios/registro", { metodo: "POST", corpo: { nome, email, senha }, auth: false });
-    },
-    eu: () => api("/api/usuarios/me"),
-    atualizarMeuNome: nome => api("/api/usuarios/me", { metodo: "PATCH", corpo: { nome } }),
-    // somente ADMIN
-    listarUsuarios: () => api("/api/usuarios"),
-    criarUsuario: dados => api("/api/usuarios", { metodo: "POST", corpo: dados }),
-    buscarUsuario: id => api("/api/usuarios/" + id),
-    alterarAtivo: (id, valor) => api(`/api/usuarios/${id}/ativo?valor=${valor}`, { metodo: "PATCH" })
-};
+document.addEventListener("DOMContentLoaded", () => {
+    carregarUnidades();
 
-/* Login completo: autentica, guarda o token e devolve o usuário da sessão */
-async function entrar(email, senha) {
-    const r = await Api.login(email.trim(), senha);
-    return Sessao.salvar(r.token, r.usuario);
-}
+    const busca = document.querySelector("#busca-unidades");
+    if (busca) busca.addEventListener("input", () => renderCards(filtrar(busca.value)));
+});

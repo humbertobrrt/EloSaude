@@ -1,9 +1,9 @@
-/* Cliente da API EloSaúde (documentada em http://localhost:8080/swagger-ui/index.html) */
+
 const API_URL = "http://localhost:8080";
 const CHAVE_TOKEN = "elosaude_token";
 const CHAVE_USER = "elosaude_user";
 
-/* Perfil do backend -> perfil usado nas telas do front */
+
 const PERFIL_FRONT = { PACIENTE: "paciente", PROFISSIONAL: "medico", ADMIN: "medico" };
 
 const Sessao = {
@@ -19,7 +19,7 @@ const Sessao = {
             nome: usuarioApi.nome,
             perfilApi: usuarioApi.perfil,
             perfil: PERFIL_FRONT[usuarioApi.perfil] || "paciente",
-            unidadeId: "u1" // o backend ainda não vincula usuário a unidade
+            unidadeId: "u1" 
         };
         sessionStorage.setItem(CHAVE_TOKEN, token);
         sessionStorage.setItem(CHAVE_USER, JSON.stringify(u));
@@ -79,7 +79,6 @@ const Api = {
     },
     eu: () => api("/api/usuarios/me"),
     atualizarMeuNome: nome => api("/api/usuarios/me", { metodo: "PATCH", corpo: { nome } }),
-    // somente ADMIN
     listarUsuarios: () => api("/api/usuarios"),
     criarUsuario: dados => api("/api/usuarios", { metodo: "POST", corpo: dados }),
     buscarUsuario: id => api("/api/usuarios/" + id),

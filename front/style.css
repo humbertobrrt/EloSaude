@@ -713,3 +713,7 @@ footer {
 details { margin-top: 10px; }
 summary { cursor: pointer; color: var(--pri); font-weight: 700; }
 details p { margin: 10px 0 0; }
+/* AÇÕES DA FICHA */
+.acoes { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+button.danger { background: #fdeaea; color: #b3261e; }
+button.danger:hover { background: #b3261e; color: #fff; }

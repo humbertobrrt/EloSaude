@@ -1,4 +1,3 @@
-
 /* Unidades vêm da API (GET /api/unidades-saude). Começa vazio e é preenchido por carregarUnidades(). */
 let unidades = [];
 let erroUnidades = "";
@@ -270,7 +269,12 @@ const pagesMedico = {
             <p>${esc(f.motivo)}</p>
             <div class="row">
               <small class="muted">${esc(nome(f.unidadeId))} · ${esc(f.data)}</small>
-              ${aberta(f) ? `<button class="ghost" data-av="${esc(f.id)}">Avançar status</button>` : ""}
+              <span class="acoes">
+                ${aberta(f) ? `<button class="ghost" data-av="${esc(f.id)}">Avançar status</button>
+                <button data-conc="${esc(f.id)}">Concluir ficha</button>` : ""}
+                ${f.status === "Concluída" ? `<button class="ghost" data-volt="${esc(f.id)}">Voltar status</button>
+                <button class="danger" data-apag="${esc(f.id)}">Apagar</button>` : ""}
+              </span>
             </div>
           </div>
         `).join("")}
@@ -730,6 +734,49 @@ function bind() {
             ficha.status = estados[Math.min(indice + 1, estados.length - 1)];
 
             save();
+        });
+    });
+
+    document.querySelectorAll("[data-conc]").forEach(botao => {
+        botao.addEventListener("click", () => {
+            if (!exige("medico")) return;
+            const ficha = S.fichas.find(f => f.id === botao.dataset.conc);
+            if (!ficha || !aberta(ficha)) return;
+
+            ficha.statusAnterior = ficha.status;
+            ficha.status = "Concluída";
+            ficha.concluidaEm = hoje();
+            save();
+            toast("Ficha concluída!");
+        });
+    });
+
+    document.querySelectorAll("[data-volt]").forEach(botao => {
+        botao.addEventListener("click", () => {
+            if (!exige("medico")) return;
+            const ficha = S.fichas.find(f => f.id === botao.dataset.volt);
+            if (!ficha || ficha.status !== "Concluída") return;
+
+            ficha.status = ficha.statusAnterior && ficha.statusAnterior !== "Concluída"
+                ? ficha.statusAnterior
+                : "Agendada";
+            delete ficha.statusAnterior;
+            delete ficha.concluidaEm;
+            save();
+            toast(`Status revertido para "${ficha.status}".`);
+        });
+    });
+
+    document.querySelectorAll("[data-apag]").forEach(botao => {
+        botao.addEventListener("click", () => {
+            if (!exige("medico")) return;
+            const ficha = S.fichas.find(f => f.id === botao.dataset.apag);
+            if (!ficha) return;
+            if (!confirm(`Apagar a ficha ${ficha.id} de ${ficha.paciente}? Essa ação não pode ser desfeita.`)) return;
+
+            S.fichas = S.fichas.filter(f => f.id !== ficha.id);
+            save();
+            toast("Ficha apagada.");
         });
     });
 

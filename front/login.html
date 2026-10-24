@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +12,7 @@
 
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap"
-    rel="stylesheet"
-  >
+    rel="stylesheet">
 
   <link rel="stylesheet" href="login.css">
 </head>
@@ -23,7 +22,10 @@
   <main class="login-card">
 
     <header class="login-brand">
-      <div class="login-symbol">+</div>
+
+
+
+      <img class="login-logo" src="img/elosaude-icone%20(1).png" alt="" width="64" height="64">
 
       <h1>Elo<span>Saúde</span></h1>
 
@@ -37,36 +39,18 @@
 
       <label for="email">E-mail institucional</label>
 
-      <input
-        type="email"
-        id="email"
-        name="email"
-        placeholder="seu@email.com"
-        autocomplete="username"
-        required
-      >
+      <input type="email" id="email" name="email" placeholder="seu@email.com" autocomplete="username" required>
 
       <label for="senha">Senha</label>
 
-      <input
-        type="password"
-        id="senha"
-        name="senha"
-        placeholder="Digite sua senha"
-        autocomplete="current-password"
-        required
-      >
+      <input type="password" id="senha" name="senha" placeholder="Digite sua senha" autocomplete="current-password"
+        required>
 
       <button class="login-button" type="submit">
         Entrar no sistema →
       </button>
 
-      <p
-        id="erro"
-        class="login-error"
-        role="alert"
-        aria-live="polite"
-      ></p>
+      <p id="erro" class="login-error" role="alert" aria-live="polite"></p>
 
     </form>
 
@@ -84,7 +68,7 @@
     const erro = document.getElementById("erro");
     const botao = form.querySelector("button");
 
-    form.addEventListener("submit", function(event) {
+    form.addEventListener("submit", function (event) {
       event.preventDefault();
 
       erro.textContent = "";
@@ -119,4 +103,5 @@
   </script>
 
 </body>
+
 </html>

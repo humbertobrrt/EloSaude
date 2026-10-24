@@ -1,4 +1,3 @@
-
 package com.elo.saude.dev.projeto.service;
 
 import com.elo.saude.dev.projeto.dto.unidadesaude.UnidadeSaudeCreateRequest;
@@ -30,7 +29,7 @@ public class UnidadeSaudeService {
         UnidadeSaude unidade = new UnidadeSaude();
 
         unidade.setNome(req.nome().trim());
-        unidade.setTipo(req.tipo().trim());
+        unidade.setTipo(req.tipo());
         unidade.setCnes(cnes);
         unidade.setEndereco(req.endereco());
         unidade.setBairro(req.bairro());
@@ -87,7 +86,7 @@ public class UnidadeSaudeService {
         validarCnesDisponivelParaAtualizacao(novoCnes, unidade);
 
         unidade.setNome(req.nome().trim());
-        unidade.setTipo(req.tipo().trim());
+        unidade.setTipo(req.tipo());
         unidade.setCnes(novoCnes);
         unidade.setEndereco(req.endereco());
         unidade.setBairro(req.bairro());

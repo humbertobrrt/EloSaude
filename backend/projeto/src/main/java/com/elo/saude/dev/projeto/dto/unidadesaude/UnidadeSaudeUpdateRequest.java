@@ -1,6 +1,8 @@
 package com.elo.saude.dev.projeto.dto.unidadesaude;
 
+import com.elo.saude.dev.projeto.enums.TipoUnidade;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -10,9 +12,8 @@ public record UnidadeSaudeUpdateRequest(
         @Size(max = 150)
         String nome,
 
-        @NotBlank(message = "O tipo é obrigatório")
-        @Size(max = 20)
-        String tipo,
+        @NotNull(message = "O tipo é obrigatório")
+        TipoUnidade tipo,
 
         @Size(max = 10)
         String cnes,
@@ -39,4 +40,3 @@ public record UnidadeSaudeUpdateRequest(
         String especialidades
 
 ) {}
-

@@ -1,16 +1,17 @@
 package com.elo.saude.dev.projeto.entity;
 
+import com.elo.saude.dev.projeto.enums.TipoUnidade;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-
-import com.elo.saude.dev.projeto.enums.*;
-import lombok.AccessLevel;
+import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 @Table(name = "unidade_saude")
 public class UnidadeSaude {
 
@@ -28,8 +29,24 @@ public class UnidadeSaude {
     @Column(length = 10)
     private String cnes;
 
+    @Column(length = 200)
+    private String endereco;
+
+    @Column(length = 100)
+    private String bairro;
+
     @Column(nullable = false, length = 100)
     private String cidade;
+
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(nullable = false, length = 2)
+    private String uf;
+
+    @Column(length = 20)
+    private String telefone;
+
+    @Column(length = 500)
+    private String especialidades;
 
     @Column(nullable = false)
     private boolean ativa = true;

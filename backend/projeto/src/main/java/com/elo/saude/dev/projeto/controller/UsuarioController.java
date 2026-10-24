@@ -33,7 +33,6 @@ public class UsuarioController {
                 service.criar(req.nome(), req.email(), req.senha(), Perfil.PACIENTE));
     }
 
-    // Qualquer usuário logado
     @GetMapping("/me")
     public UsuarioResponse me(Authentication auth) {
         return UsuarioResponse.from(service.buscarPorEmail(auth.getName()));

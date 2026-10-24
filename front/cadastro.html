@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro | EloSaúde</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css">
+</head>
+<body class="login-body">
+  <main class="login-card">
+    <header class="login-brand">
+      <img class="login-logo" src="img/elosaude-icone%20(1).png" alt="" width="64" height="64">
+      <h1>Elo<span>Saúde</span></h1>
+      <p>Crie sua conta de paciente.</p>
+    </header>
+
+    <form id="cadForm" class="login-form">
+      <label for="nome">Nome completo</label>
+      <input type="text" id="nome" maxlength="150" autocomplete="name" required>
+
+      <label for="email">E-mail</label>
+      <input type="email" id="email" maxlength="150" autocomplete="username" required>
+
+      <label for="senha">Senha (mínimo 8 caracteres)</label>
+      <input type="password" id="senha" minlength="8" maxlength="72" autocomplete="new-password" required>
+
+      <button class="login-button" type="submit">Criar conta →</button>
+      <p id="erro" class="login-error" role="alert" aria-live="polite"></p>
+    </form>
+
+    <footer class="login-footer">
+      Já tem conta? <a href="login.html">Entrar</a>
+    </footer>
+  </main>
+
+  <script src="api.js"></script>
+  <script>
+    const form = document.getElementById("cadForm");
+    const erro = document.getElementById("erro");
+    const botao = form.querySelector("button");
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      erro.textContent = "";
+      botao.disabled = true;
+      botao.textContent = "Criando...";
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value;
+      try {
+        await Api.registrar(document.getElementById("nome").value.trim(), email, senha);
+        await entrar(email, senha);
+        location.href = "index.html";
+      } catch (err) {
+        erro.textContent = err.status === 409 ? "Este e-mail já está cadastrado." : err.message;
+        botao.disabled = false;
+        botao.textContent = "Criar conta →";
+      }
+    });
+  </script>
+</body>
+</html>

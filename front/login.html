@@ -55,47 +55,36 @@
     </form>
 
     <footer class="login-footer">
-      Ambiente demonstrativo<br>
-      Paciente: paciente@elosaude.com.br / Paciente123!<br>
-      Médico: medico@elosaude.com.br / Medico123!
+      Não tem conta? <a href="cadastro.html">Cadastre-se como paciente</a>
     </footer>
 
   </main>
 
+  <script src="api.js"></script>
   <script src="contas.js"></script>
   <script>
     const form = document.getElementById("loginForm");
     const erro = document.getElementById("erro");
     const botao = form.querySelector("button");
 
-    form.addEventListener("submit", function (event) {
+    form.addEventListener("submit", async function (event) {
       event.preventDefault();
-
       erro.textContent = "";
+      botao.disabled = true;
+      botao.textContent = "Entrando...";
 
-      const email = document
-        .getElementById("email")
-        .value
-        .trim();
-
-      const senha = document
-        .getElementById("senha")
-        .value;
-
-      const conta = autenticar(email, senha);
-
-      if (conta) {
-        salvarSessao(conta);
-
-        botao.disabled = true;
-        botao.textContent = "Entrando...";
-
+      try {
+        await entrar(
+          document.getElementById("email").value,
+          document.getElementById("senha").value
+        );
         window.location.href = "index.html";
-
-      } else {
-        erro.textContent =
-          "E-mail ou senha incorretos. Tente novamente.";
-
+      } catch (e) {
+        erro.textContent = e.status === 401
+          ? "E-mail ou senha incorretos. Tente novamente."
+          : e.message;
+        botao.disabled = false;
+        botao.textContent = "Entrar no sistema →";
         document.getElementById("senha").value = "";
         document.getElementById("senha").focus();
       }

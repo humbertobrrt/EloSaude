@@ -117,39 +117,31 @@ function telaLogin() {
           <button class="login-button" type="submit">Entrar no sistema →</button>
           <p id="loginError" class="login-error" role="alert"></p>
         </form>
-
-        <div class="login-note">
-          Ambiente demonstrativo<br>
-          Paciente: paciente@elosaude.com.br / Paciente123!<br>
-          Médico: medico@elosaude.com.br / Medico123!
-        </div>
       </div>
     </section>
   `;
 
-    $("#loginForm").addEventListener("submit", evento => {
+    $("#loginForm").addEventListener("submit", async evento => {
         evento.preventDefault();
+        const botao = evento.target.querySelector("button");
+        botao.disabled = true;
 
-        const email = $("#email").value.trim();
-        const senha = $("#senha").value;
-
-        const conta = autenticar(email, senha);
-
-        if (conta) {
-            usuario = conta;
-            salvarSessao(conta);
+        try {
+            usuario = await entrar($("#email").value, $("#senha").value);
             location.hash = "#/";
             render();
-            toast("Bem-vindo(a), " + conta.nome + "!");
-        } else {
-            $("#loginError").textContent = "E-mail ou senha incorretos.";
+            toast("Bem-vindo(a), " + usuario.nome + "!");
+        } catch (e) {
+            $("#loginError").textContent = e.status === 401 ? "E-mail ou senha incorretos." : e.message;
+            botao.disabled = false;
         }
     });
 }
 
 function sair() {
     usuario = null;
-    sessionStorage.removeItem("elosaude_user");
+    Sessao.limpar();
+    location.href = "login.html";
     render();
     toast("Você saiu do sistema.");
 }

@@ -88,7 +88,7 @@ const Api = {
     alterarAtivo: (id, valor) => api(`/api/usuarios/${id}/ativo?valor=${valor}`, { metodo: "PATCH" }),
 
     // --- Unidades de Saúde ---
-    listarUnidades: () => api("/api/unidades-saude", { auth: false }), // rota pública (200 sem token no Swagger)
+    listarUnidades: () => api("/api/unidades-saude"), // exige token (401 sem login)
     buscarUnidade: id => api("/api/unidades-saude/" + id),
     criarUnidade: dados => api("/api/unidades-saude", { metodo: "POST", corpo: dados }),
     atualizarUnidade: (id, dados) => api("/api/unidades-saude/" + id, { metodo: "PUT", corpo: dados }),

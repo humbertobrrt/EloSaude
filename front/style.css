@@ -30,39 +30,13 @@ h3,
 
 /* CABEÇALHO */
 
-/* logo: troque o bloco .logo b por estes dois */
-.logo b {
-    color: var(--pri);
-}
-
 .logo img {
     width: 40px;
     height: 40px;
     flex-shrink: 0;
     object-fit: contain;
     display: block;
-    margin-left: 25px;
 }
-
-/* menu */
-nav {
-    display: flex;
-    flex: 1;
-    justify-content: flex-end;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-
-nav a {
-    padding: 8px 12px;
-    border-radius: 999px;
-    text-decoration: none;
-    color: var(--muted);
-    font-weight: 600;
-    transition: 0.25s;
-}
-
-
 
 .top {
     position: sticky;
@@ -114,17 +88,33 @@ nav a {
 
 nav {
     display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
     gap: 4px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.top > .tema-toggle {
+    order: 1;
+    flex: 0 0 auto;
+}
+
+.top > nav {
+    order: 2;
 }
 
 nav a {
     padding: 12px 18px;
+    flex: 0 0 auto;
     border-radius: 999px;
     text-decoration: none;
     color: var(--muted);
     font-weight: 600;
     transition: 0.25s;
+    white-space: nowrap;
 }
 
 nav a:hover {
@@ -344,12 +334,34 @@ textarea {
     transition: 0.2s;
 }
 
+input[type="checkbox"] {
+    appearance: auto;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    margin: 0;
+    padding: 0;
+    accent-color: var(--pri);
+    cursor: pointer;
+}
+
 input:focus,
 select:focus,
 textarea:focus {
     outline: none;
     border-color: var(--pri);
     box-shadow: 0 0 0 4px #13b39c33;
+}
+
+input[type="checkbox"]:focus {
+    border-color: initial;
+    box-shadow: none;
+}
+
+#fPriv label {
+    align-items: center;
+    cursor: pointer;
+    line-height: 1.5;
 }
 
 textarea {
@@ -653,12 +665,13 @@ footer {
 
 @media (max-width: 600px) {
     .top {
-        padding: 14px 5vw;
+        padding: 12px 5vw;
     }
 
     nav {
         width: 100%;
-        gap: 5px;
+        flex-basis: 100%;
+        gap: 4px;
     }
 
     nav a {

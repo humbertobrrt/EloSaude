@@ -1,9 +1,9 @@
-
+/* Cliente da API EloSaúde (documentada em http://localhost:8080/swagger-ui/index.html) */
 const API_URL = "http://localhost:8080";
 const CHAVE_TOKEN = "elosaude_token";
 const CHAVE_USER = "elosaude_user";
 
-
+/* Perfil do backend -> perfil usado nas telas do front */
 const PERFIL_FRONT = { PACIENTE: "paciente", PROFISSIONAL: "medico", ADMIN: "medico" };
 
 const Sessao = {
@@ -19,7 +19,7 @@ const Sessao = {
             nome: usuarioApi.nome,
             perfilApi: usuarioApi.perfil,
             perfil: PERFIL_FRONT[usuarioApi.perfil] || "paciente",
-            unidadeId: "u1" 
+            unidadeId: null // o backend ainda não vincula usuário a unidade
         };
         sessionStorage.setItem(CHAVE_TOKEN, token);
         sessionStorage.setItem(CHAVE_USER, JSON.stringify(u));
@@ -36,9 +36,10 @@ class ApiError extends Error {
 }
 
 async function api(caminho, { metodo = "GET", corpo, auth = true } = {}) {
-    const headers = { "Content-Type": "application/json" };
-    
-    // CORREÇÃO: Só adiciona o token se auth for true E existir um token válido
+    const headers = {};
+    if (corpo) headers["Content-Type"] = "application/json";
+
+    // Só adiciona o token se auth for true E existir um token válido
     if (auth) {
         const token = Sessao.token();
         if (token) {
@@ -71,6 +72,7 @@ async function api(caminho, { metodo = "GET", corpo, auth = true } = {}) {
 }
 
 const Api = {
+    // --- Autenticação e Usuário Atual ---
     login: (email, senha) => api("/api/auth/login", { metodo: "POST", corpo: { email, senha }, auth: false }),
     registrar: (nome, email, senha) => {
         // Garante que qualquer sessão residual seja limpa antes de registrar
@@ -79,10 +81,29 @@ const Api = {
     },
     eu: () => api("/api/usuarios/me"),
     atualizarMeuNome: nome => api("/api/usuarios/me", { metodo: "PATCH", corpo: { nome } }),
+
+    // --- Gerenciamento de Usuários (somente ADMIN) ---
     listarUsuarios: () => api("/api/usuarios"),
     criarUsuario: dados => api("/api/usuarios", { metodo: "POST", corpo: dados }),
     buscarUsuario: id => api("/api/usuarios/" + id),
-    alterarAtivo: (id, valor) => api(`/api/usuarios/${id}/ativo?valor=${valor}`, { metodo: "PATCH" })
+    alterarAtivo: (id, valor) => api(`/api/usuarios/${id}/ativo?valor=${valor}`, { metodo: "PATCH" }),
+
+    // --- Unidades de Saúde ---
+    listarUnidades: async () => {
+        try {
+            return await api("/api/unidades-saude", { auth: false }); // sem token e sem Content-Type: evita o preflight de CORS
+        } catch (e) {
+            // se o backend recusar, tenta de novo com o token da sessão
+            if ((e.status === 401 || e.status === 403) && Sessao.token()) return api("/api/unidades-saude");
+            throw e;
+        }
+    },
+    buscarUnidade: id => api("/api/unidades-saude/" + id),
+    criarUnidade: dados => api("/api/unidades-saude", { metodo: "POST", corpo: dados }),
+    atualizarUnidade: (id, dados) => api("/api/unidades-saude/" + id, { metodo: "PUT", corpo: dados }),
+    excluirUnidade: id => api("/api/unidades-saude/" + id, { metodo: "DELETE" }),
+    buscarPorCnes: cnes => api("/api/unidades-saude/cnes/" + cnes),
+    alterarUnidadeAtiva: (id, valor) => api(`/api/unidades-saude/${id}/ativa`, { metodo: "PATCH", corpo: { ativa: valor } })
 };
 
 /* Login completo: autentica, guarda o token e devolve o usuário da sessão */

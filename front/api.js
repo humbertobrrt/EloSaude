@@ -36,7 +36,8 @@ class ApiError extends Error {
 }
 
 async function api(caminho, { metodo = "GET", corpo, auth = true } = {}) {
-    const headers = { "Content-Type": "application/json" };
+    const headers = {};
+    if (corpo) headers["Content-Type"] = "application/json";
 
     // Só adiciona o token se auth for true E existir um token válido
     if (auth) {
@@ -88,7 +89,15 @@ const Api = {
     alterarAtivo: (id, valor) => api(`/api/usuarios/${id}/ativo?valor=${valor}`, { metodo: "PATCH" }),
 
     // --- Unidades de Saúde ---
-    listarUnidades: () => api("/api/unidades-saude"), // exige token (401 sem login)
+    listarUnidades: async () => {
+        try {
+            return await api("/api/unidades-saude", { auth: false }); // sem token e sem Content-Type: evita o preflight de CORS
+        } catch (e) {
+            // se o backend recusar, tenta de novo com o token da sessão
+            if ((e.status === 401 || e.status === 403) && Sessao.token()) return api("/api/unidades-saude");
+            throw e;
+        }
+    },
     buscarUnidade: id => api("/api/unidades-saude/" + id),
     criarUnidade: dados => api("/api/unidades-saude", { metodo: "POST", corpo: dados }),
     atualizarUnidade: (id, dados) => api("/api/unidades-saude/" + id, { metodo: "PUT", corpo: dados }),

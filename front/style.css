@@ -318,6 +318,7 @@ main {
 form {
     display: grid;
     gap: 12px;
+    min-width: 0;
 }
 
 label {
@@ -325,11 +326,16 @@ label {
     font-size: 0.9rem;
     display: grid;
     gap: 6px;
+    min-width: 0;
 }
 
 input,
 select,
 textarea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    text-overflow: ellipsis;
     font: inherit;
     padding: 11px 12px;
     border: 1px solid var(--line);
@@ -378,7 +384,11 @@ button.ghost {
 .two {
     display: grid;
     gap: 22px;
-    grid-template-columns: minmax(280px, 380px) 1fr;
+    grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+}
+
+.two > * {
+    min-width: 0;
 }
 
 .list {

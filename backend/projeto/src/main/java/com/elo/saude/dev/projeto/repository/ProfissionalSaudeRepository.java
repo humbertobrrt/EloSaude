@@ -11,4 +11,7 @@ public interface ProfissionalSaudeRepository extends JpaRepository<ProfissionalS
     Optional<ProfissionalSaude> findByUsuarioId(Long usuarioId);
 
     List<ProfissionalSaude> findByUnidadeId(Long unidadeId);
+
+    Optional<ProfissionalSaude> findByUsuarioEmail(String email);
+
 }

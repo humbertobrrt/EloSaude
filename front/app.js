@@ -1,22 +1,43 @@
+/* Unidades vêm da API (GET /api/unidades-saude). Começa vazio e é preenchido por carregarUnidades(). */
+let unidades = [];
 
-const unidades = [
-    { id: "u1", nome: "UBS Vila Esperança", tipo: "UBS", bairro: "Zona Leste", esp: ["Clínica geral", "Enfermagem"] },
-    { id: "u2", nome: "UBS Jardim das Flores", tipo: "UBS", bairro: "Zona Sul", esp: ["Clínica geral", "Pediatria"] },
-    { id: "u3", nome: "Centro de Especialidades Norte", tipo: "Especialidade", bairro: "Zona Norte", esp: ["Cardiologia", "Endocrinologia", "Dermatologia"] },
-    { id: "u4", nome: "Hospital Municipal Central", tipo: "Hospital", bairro: "Centro", esp: ["Emergência", "Cirurgia", "Ortopedia"] },
-    { id: "u5", nome: "Ambulatório Saúde Mulher", tipo: "Especialidade", bairro: "Zona Oeste", esp: ["Ginecologia", "Obstetrícia"] }
-];
+/* Converte o formato da API para o usado nas telas (esp = array de especialidades) */
+function normalizarUnidade(u) {
+    return {
+        id: u.id,
+        nome: u.nome || "",
+        tipo: u.tipo || "",
+        bairro: u.bairro || "",
+        cidade: u.cidade || "",
+        telefone: u.telefone || "",
+        esp: typeof u.especialidades === "string"
+            ? u.especialidades.split(",").map(e => e.trim()).filter(Boolean)
+            : Array.isArray(u.especialidades) ? u.especialidades : [],
+        ativa: u.ativa !== false
+    };
+}
+
+async function carregarUnidades() {
+    try {
+        const dados = await Api.listarUnidades();
+        const lista = Array.isArray(dados) ? dados : (dados?.content || []);
+        unidades = lista.map(normalizarUnidade).filter(u => u.ativa);
+    } catch (erro) {
+        console.error(erro);
+        toast(erro.message || "Não foi possível carregar as unidades.");
+    }
+}
 
 const inicial = {
     fichas: [
-        { id: "F-1024", paciente: "Maria Souza", unidadeId: "u1", motivo: "Controle de pressão arterial", status: "Agendada", data: "2026-10-20" },
-        { id: "F-1025", paciente: "João Lima", unidadeId: "u2", motivo: "Dor lombar persistente", status: "Em triagem", data: "2026-10-22" }
+        { id: "F-1024", paciente: "Maria Souza", unidadeId: 1, motivo: "Controle de pressão arterial", status: "Agendada", data: "2026-10-20" },
+        { id: "F-1025", paciente: "João Lima", unidadeId: 2, motivo: "Dor lombar persistente", status: "Em triagem", data: "2026-10-22" }
     ],
     registros: [
-        { id: "R-1", paciente: "Maria Souza", profissional: "Dra. Ana Ribeiro", unidadeId: "u1", data: "2026-10-20", conduta: "Ajuste de losartana 50mg", obs: "PA 150x95. Encaminhada à cardiologia." }
+        { id: "R-1", paciente: "Maria Souza", profissional: "Dra. Ana Ribeiro", unidadeId: 1, data: "2026-10-20", conduta: "Ajuste de losartana 50mg", obs: "PA 150x95. Encaminhada à cardiologia." }
     ],
     enc: [
-        { id: "E-301", paciente: "Maria Souza", origemId: "u1", destinoId: "u3", esp: "Cardiologia", resumo: "Hipertensão de difícil controle.", comp: ["Medicações em uso", "Últimos exames", "Alergias"], status: "Recebido", data: "2026-10-20" }
+        { id: "E-301", paciente: "Maria Souza", origemId: 1, destinoId: 3, esp: "Cardiologia", resumo: "Hipertensão de difícil controle.", comp: ["Medicações em uso", "Últimos exames", "Alergias"], status: "Recebido", data: "2026-10-20" }
     ],
     receitas: [
         { id: "RX-1", paciente: "Maria Souza", medico: "Dra. Ana Ribeiro", medicamento: "Losartana 50 mg", posologia: "1 comprimido pela manhã, uso contínuo", validade: "2026-11-20", data: "2026-10-20" }
@@ -57,7 +78,7 @@ const esc = texto => String(texto ?? "").replace(/[&<>"']/g, c => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
 })[c]);
 
-const nome = id => unidades.find(u => u.id === id)?.nome || "—";
+const nome = id => unidades.find(u => String(u.id) === String(id))?.nome || "—";
 const novoId = prefixo => prefixo + "-" + Date.now().toString(36);
 
 const hoje = () => {
@@ -68,7 +89,7 @@ const hoje = () => {
 const tag = status => `<span class="tag s-${esc(status.split(" ")[0])}">${esc(status)}</span>`;
 
 const opts = sel => unidades.map(u =>
-    `<option value="${u.id}"${u.id === sel ? " selected" : ""}>${esc(u.nome)}</option>`
+    `<option value="${esc(u.id)}"${String(u.id) === String(sel) ? " selected" : ""}>${esc(u.nome)}</option>`
 ).join("");
 
 const form = evento => Object.fromEntries(new FormData(evento.target));
@@ -195,7 +216,7 @@ const pagesMedico = {
 
         return `
     <h2>Olá, ${esc(usuario.nome)}</h2>
-    <p class="muted">${esc(nome(usuario.unidadeId))}</p>
+    ${usuario.unidadeId ? `<p class="muted">${esc(nome(usuario.unidadeId))}</p>` : ""}
 
     <div class="grid stagger">
       <div class="card stat"><b>${S.fichas.filter(aberta).length}</b>fichas em aberto</div>
@@ -284,7 +305,7 @@ const pagesMedico = {
         <form id="fEnc">
           <label>Paciente<input name="paciente" required></label>
           <label>Origem<select name="origemId">${opts(usuario.unidadeId)}</select></label>
-          <label>Destino<select name="destinoId">${opts("u3")}</select></label>
+          <label>Destino<select name="destinoId">${opts(unidades.find(u => u.tipo !== "UBS")?.id)}</select></label>
           <label>Especialidade<input name="esp" required></label>
           <label>Resumo clínico<textarea name="resumo" required></textarea></label>
 
@@ -736,3 +757,4 @@ function bind() {
 
 window.addEventListener("hashchange", render);
 render();
+carregarUnidades().then(() => { if (usuario) render(); });

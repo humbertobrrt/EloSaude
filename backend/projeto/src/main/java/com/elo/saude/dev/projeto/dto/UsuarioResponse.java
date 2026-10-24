@@ -1,7 +1,7 @@
 package com.elo.saude.dev.projeto.dto;
 
 import com.elo.saude.dev.projeto.entity.Usuario;
-import com.elo.saude.dev.projeto.enuns.Perfil;
+import com.elo.saude.dev.projeto.enums.Perfil;
 
 import java.time.LocalDateTime;
 

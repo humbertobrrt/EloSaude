@@ -1,7 +1,7 @@
 package com.elo.saude.dev.projeto.service;
 
 import com.elo.saude.dev.projeto.entity.Usuario;
-import com.elo.saude.dev.projeto.enuns.Perfil;
+import com.elo.saude.dev.projeto.enums.Perfil;
 import com.elo.saude.dev.projeto.repository.UsuarioRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;

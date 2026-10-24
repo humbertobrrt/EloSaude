@@ -1,7 +1,8 @@
-
 package com.elo.saude.dev.projeto.repository;
 
 import com.elo.saude.dev.projeto.entity.Encaminhamento;
+import com.elo.saude.dev.projeto.enums.Prioridade;
+import com.elo.saude.dev.projeto.enums.StatusEncaminhamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,9 +16,7 @@ public interface EncaminhamentoRepository
 
     List<Encaminhamento> findByUnidadeDestinoId(Long unidadeId);
 
-    List<Encaminhamento> findByStatus(
-            Encaminhamento.StatusEncaminhamento status);
+    List<Encaminhamento> findByStatus(StatusEncaminhamento status);
 
-    List<Encaminhamento> findByPrioridade(
-            Encaminhamento.Prioridade prioridade);
+    List<Encaminhamento> findByPrioridade(Prioridade prioridade);
 }

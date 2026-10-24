@@ -1,7 +1,8 @@
-
 package com.elo.saude.dev.projeto.service;
 
 import com.elo.saude.dev.projeto.entity.Encaminhamento;
+import com.elo.saude.dev.projeto.enums.Prioridade;
+import com.elo.saude.dev.projeto.enums.StatusEncaminhamento;
 import com.elo.saude.dev.projeto.repository.EncaminhamentoRepository;
 
 import org.springframework.http.HttpStatus;
@@ -53,13 +54,13 @@ public class EncaminhamentoService {
 
     @Transactional(readOnly = true)
     public List<Encaminhamento> buscarPorStatus(
-            Encaminhamento.StatusEncaminhamento status) {
+            StatusEncaminhamento status) {
         return repository.findByStatus(status);
     }
 
     @Transactional(readOnly = true)
     public List<Encaminhamento> buscarPorPrioridade(
-            Encaminhamento.Prioridade prioridade) {
+            Prioridade prioridade) {
         return repository.findByPrioridade(prioridade);
     }
 
@@ -88,19 +89,24 @@ public class EncaminhamentoService {
                     "A prioridade é obrigatória.");
         }
 
+        if (encaminhamento.getMotivo() == null
+                || encaminhamento.getMotivo().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O motivo é obrigatório.");
+        }
+
         if (encaminhamento.getStatus() == null) {
-            encaminhamento.setStatus(
-                    Encaminhamento.StatusEncaminhamento.CRIADO);
+            encaminhamento.setStatus(StatusEncaminhamento.CRIADO);
         }
 
         return repository.save(encaminhamento);
     }
 
-
     @Transactional
     public Encaminhamento atualizarStatus(
             Long id,
-            Encaminhamento.StatusEncaminhamento novoStatus) {
+            StatusEncaminhamento novoStatus) {
 
         if (novoStatus == null) {
             throw new ResponseStatusException(

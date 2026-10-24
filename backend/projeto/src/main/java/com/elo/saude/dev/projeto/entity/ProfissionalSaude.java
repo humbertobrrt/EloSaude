@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 
 import com.elo.saude.dev.projeto.enums.*;
 import lombok.AccessLevel;
+import lombok.Setter;
 
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "profissional_saude")
 public class ProfissionalSaude {

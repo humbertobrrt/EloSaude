@@ -1,9 +1,17 @@
 package com.elo.saude.dev.projeto.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "contra_referencia")
 public class ContraReferencia {
 
@@ -12,97 +20,34 @@ public class ContraReferencia {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "encaminhamento_id",
-            nullable = false,
-            unique = true
-    )
+    @JoinColumn(name = "encaminhamento_id", nullable = false, unique = true)
     private Encaminhamento encaminhamento;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "atendimento_destino_id")
     private Atendimento atendimentoDestino;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "profissional_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "profissional_id", nullable = false)
     private ProfissionalSaude profissional;
 
-    @Column(name = "resumo_clinico", columnDefinition = "TEXT")
+    @Column(name = "resumo_atendimento", nullable = false, columnDefinition = "text")
     private String resumoClinico;
 
-    @Column(name = "plano", columnDefinition = "TEXT")
+    @Column(name = "plano_cuidado", columnDefinition = "text")
     private String plano;
 
-    @Column(name = "orientacoes", columnDefinition = "TEXT")
+    @Column(name = "orientacoes_unidade_origem", columnDefinition = "text")
     private String orientacoes;
 
-    @Column(name = "data_retorno")
+    @Column(name = "retorno_recomendado_em")
     private LocalDate dataRetorno;
 
-    public ContraReferencia() {
-    }
+    @Column(name = "criado_em", nullable = false, updatable = false)
+    private LocalDateTime criadoEm;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Encaminhamento getEncaminhamento() {
-        return encaminhamento;
-    }
-
-    public void setEncaminhamento(Encaminhamento encaminhamento) {
-        this.encaminhamento = encaminhamento;
-    }
-
-    public Atendimento getAtendimentoDestino() {
-        return atendimentoDestino;
-    }
-
-    public void setAtendimentoDestino(Atendimento atendimentoDestino) {
-        this.atendimentoDestino = atendimentoDestino;
-    }
-
-    public ProfissionalSaude getProfissional() {
-        return profissional;
-    }
-
-    public void setProfissional(ProfissionalSaude profissional) {
-        this.profissional = profissional;
-    }
-
-    public String getResumoClinico() {
-        return resumoClinico;
-    }
-
-    public void setResumoClinico(String resumoClinico) {
-        this.resumoClinico = resumoClinico;
-    }
-
-    public String getPlano() {
-        return plano;
-    }
-
-    public void setPlano(String plano) {
-        this.plano = plano;
-    }
-
-    public String getOrientacoes() {
-        return orientacoes;
-    }
-
-    public void setOrientacoes(String orientacoes) {
-        this.orientacoes = orientacoes;
-    }
-
-    public LocalDate getDataRetorno() {
-        return dataRetorno;
-    }
-
-    public void setDataRetorno(LocalDate dataRetorno) {
-        this.dataRetorno = dataRetorno;
+    @PrePersist
+    void prePersist() {
+        if (criadoEm == null) criadoEm = LocalDateTime.now();
     }
 }

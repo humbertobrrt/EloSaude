@@ -1,17 +1,20 @@
-
 package com.elo.saude.dev.projeto.controller;
 
 import com.elo.saude.dev.projeto.entity.Encaminhamento;
+import com.elo.saude.dev.projeto.enums.Prioridade;
+import com.elo.saude.dev.projeto.enums.StatusEncaminhamento;
 import com.elo.saude.dev.projeto.service.EncaminhamentoService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/encaminhamentos")
+@PreAuthorize("hasRole('ADMIN')")
 public class EncaminhamentoController {
 
     private final EncaminhamentoService service;
@@ -55,13 +58,13 @@ public class EncaminhamentoController {
 
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Encaminhamento>> buscarPorStatus(
-            @PathVariable Encaminhamento.StatusEncaminhamento status) {
+            @PathVariable StatusEncaminhamento status) {
         return ResponseEntity.ok(service.buscarPorStatus(status));
     }
 
     @GetMapping("/prioridade/{prioridade}")
     public ResponseEntity<List<Encaminhamento>> buscarPorPrioridade(
-            @PathVariable Encaminhamento.Prioridade prioridade) {
+            @PathVariable Prioridade prioridade) {
         return ResponseEntity.ok(
                 service.buscarPorPrioridade(prioridade));
     }
@@ -78,8 +81,7 @@ public class EncaminhamentoController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<Encaminhamento> atualizarStatus(
             @PathVariable Long id,
-            @RequestParam
-            Encaminhamento.StatusEncaminhamento status) {
+            @RequestParam StatusEncaminhamento status) {
 
         return ResponseEntity.ok(
                 service.atualizarStatus(id, status));
@@ -91,4 +93,3 @@ public class EncaminhamentoController {
         return ResponseEntity.noContent().build();
     }
 }
-

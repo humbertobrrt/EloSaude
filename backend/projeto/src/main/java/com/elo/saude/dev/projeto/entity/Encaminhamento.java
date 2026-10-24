@@ -1,27 +1,20 @@
 package com.elo.saude.dev.projeto.entity;
 
+import com.elo.saude.dev.projeto.enums.Prioridade;
+import com.elo.saude.dev.projeto.enums.StatusEncaminhamento;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "encaminhamento")
 public class Encaminhamento {
-
-    public enum Prioridade {
-        BAIXA,
-        MEDIA,
-        ALTA,
-        URGENTE
-    }
-
-    public enum StatusEncaminhamento {
-        CRIADO,
-        ENVIADO,
-        RECEBIDO,
-        EM_ATENDIMENTO,
-        CONCLUIDO,
-        CANCELADO
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,113 +40,41 @@ public class Encaminhamento {
     @JoinColumn(name = "profissional_solicitante_id", nullable = false)
     private ProfissionalSaude profissionalSolicitante;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Prioridade prioridade;
+    @Column(name = "especialidade_destino", length = 100)
+    private String especialidadeDestino;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusEncaminhamento status = StatusEncaminhamento.CRIADO;
+    @Column(nullable = false, length = 10)
+    private Prioridade prioridade = Prioridade.MEDIA;
 
-    @Column(name = "motivo", columnDefinition = "TEXT")
+    @Column(nullable = false, length = 500)
     private String motivo;
 
-    @Column(name = "observacoes", columnDefinition = "TEXT")
-    private String observacoes;
+    @Column(name = "resumo_clinico", columnDefinition = "text")
+    private String resumoClinico;
 
-    @Column(name = "criado_em", insertable = false, updatable = false)
+    @Column(name = "compartilhar_historico", nullable = false)
+    private boolean compartilharHistorico = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private StatusEncaminhamento status = StatusEncaminhamento.CRIADO;
+
+    @Column(name = "criado_em", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
-    public Encaminhamento() {
+    @Column(name = "atualizado_em", nullable = false)
+    private LocalDateTime atualizadoEm;
+
+    @PrePersist
+    void prePersist() {
+        LocalDateTime agora = LocalDateTime.now();
+        criadoEm = agora;
+        atualizadoEm = agora;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Paciente getPaciente() {
-        return paciente;
-    }
-
-    public void setPaciente(Paciente paciente) {
-        this.paciente = paciente;
-    }
-
-    public Atendimento getAtendimentoOrigem() {
-        return atendimentoOrigem;
-    }
-
-    public void setAtendimentoOrigem(Atendimento atendimentoOrigem) {
-        this.atendimentoOrigem = atendimentoOrigem;
-    }
-
-    public UnidadeSaude getUnidadeOrigem() {
-        return unidadeOrigem;
-    }
-
-    public void setUnidadeOrigem(UnidadeSaude unidadeOrigem) {
-        this.unidadeOrigem = unidadeOrigem;
-    }
-
-    public UnidadeSaude getUnidadeDestino() {
-        return unidadeDestino;
-    }
-
-    public void setUnidadeDestino(UnidadeSaude unidadeDestino) {
-        this.unidadeDestino = unidadeDestino;
-    }
-
-    public ProfissionalSaude getProfissionalSolicitante() {
-        return profissionalSolicitante;
-    }
-
-    public void setProfissionalSolicitante(
-            ProfissionalSaude profissionalSolicitante) {
-        this.profissionalSolicitante = profissionalSolicitante;
-    }
-
-    public Prioridade getPrioridade() {
-        return prioridade;
-    }
-
-    public void setPrioridade(Prioridade prioridade) {
-        this.prioridade = prioridade;
-    }
-
-    public StatusEncaminhamento getStatus() {
-        return status;
-    }
-
-    public void setStatus(StatusEncaminhamento status) {
-        this.status = status;
-    }
-
-    public String getMotivo() {
-        return motivo;
-    }
-
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
-    }
-
-    public String getObservacoes() {
-        return observacoes;
-    }
-
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
-    }
-
-    public LocalDateTime getCriadoEm() {
-        return criadoEm;
-    }
-
-    public void setCriadoEm(LocalDateTime criadoEm) {
-        this.criadoEm = criadoEm;
+    @PreUpdate
+    void preUpdate() {
+        atualizadoEm = LocalDateTime.now();
     }
 }
-

@@ -20,7 +20,7 @@ public record UnidadeSaudeResponse(
         return new UnidadeSaudeResponse(
                 unidade.getId(),
                 unidade.getNome(),
-                unidade.getTipo(),
+                unidade.getTipo().name(),
                 unidade.getCnes(),
                 unidade.getEndereco(),
                 unidade.getBairro(),
@@ -28,7 +28,7 @@ public record UnidadeSaudeResponse(
                 unidade.getUf(),
                 unidade.getTelefone(),
                 unidade.getEspecialidades(),
-                unidade.getAtiva()
+                unidade.isAtiva()
         );
     }
 }

@@ -38,7 +38,6 @@ public class UnidadeSaude {
     @Column(nullable = false, length = 100)
     private String cidade;
 
-    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(nullable = false, length = 2)
     private String uf;
 

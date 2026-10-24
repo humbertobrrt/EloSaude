@@ -156,7 +156,7 @@
   function atualizarBotao(tema) {
     if (!botao) return;
     var escuro = tema === "dark";
-    botao.textContent = escuro ? "☀️ Modo claro" : "🌙 Modo escuro";
+    botao.textContent = escuro ? "☀️" : "🌙";
     botao.setAttribute("aria-pressed", String(escuro));
     botao.setAttribute("aria-label",
       escuro ? "Ativar modo claro" : "Ativar modo escuro");

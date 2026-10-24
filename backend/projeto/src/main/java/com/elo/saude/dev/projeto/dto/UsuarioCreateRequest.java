@@ -1,6 +1,6 @@
 package com.elo.saude.dev.projeto.dto;
 
-import com.elo.saude.dev.projeto.enuns.Perfil;
+import com.elo.saude.dev.projeto.enums.Perfil;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

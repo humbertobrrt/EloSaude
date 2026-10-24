@@ -1,12 +1,11 @@
 package com.elo.saude.dev.projeto.controller;
 
 
-import com.elo.saude.dev.projeto.*;
 import com.elo.saude.dev.projeto.dto.AtualizarNomeRequest;
 import com.elo.saude.dev.projeto.dto.RegistroRequest;
 import com.elo.saude.dev.projeto.dto.UsuarioCreateRequest;
 import com.elo.saude.dev.projeto.dto.UsuarioResponse;
-import com.elo.saude.dev.projeto.enuns.Perfil;
+import com.elo.saude.dev.projeto.enums.Perfil;
 import com.elo.saude.dev.projeto.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
